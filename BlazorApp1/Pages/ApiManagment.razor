@@ -1,0 +1,122 @@
+﻿@page "/api"
+@using BlazorApp1.Data
+@using BlazorApp1.IServices
+ 
+<h2>API Managment</h2>
+<hr />
+<form>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="form-group">
+                <label for="ApiName" class="control-label">API Name</label>
+                <input for="APIName" class="form-control" @bind="@api.ApiName" />
+            </div>
+            
+        </div>
+    </div>
+ 
+    @if (api.IsUpdate)
+    {
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <input type="button" class="btn btn-primary" @onclick="@UpdateApi" value="Update" />
+ 
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <input type="button" class="btn btn-primary" @onclick="@CreateApi" value="Generate" />
+ 
+                </div>
+            </div>
+        </div>
+    }
+ 
+    @if (apiEntries == null)
+    {
+        <h3>Please wait, Loading the data.</h3>
+    }
+    else
+    {
+        <table class='table'>
+            <thead>
+                <tr>
+                    <th>Api Name</th>
+                    <th>Api Key</th>
+                    <th>Created</th>
+                    <th>Options</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var api in apiEntries)
+                {
+                    <tr>
+                        <td>@api.ApiName</td>
+                        <td>@api.ApiKey</td>
+                        <td>@api.CreatedDt</td>
+                        
+                        <td>
+                            <input type="button" value="Edit" @onclick="() => GetApiById(api.ApiId)" class="btn btn-primary" />
+                            <input type="button" value="Delete" @onclick="() => DeleteApi(api.ApiId)" class="btn btn-danger" />
+ 
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+ 
+</form>
+@code{
+    IEnumerable<ApiDto> apiEntries;
+    [Inject]
+    public IApiService ApiServices { get; set; }
+    ApiDto api = new ApiDto();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await this.GetApiDetails();
+    }
+    protected async Task GetApiDetails()
+    {
+        apiEntries = await ApiServices.GetApi();
+    }
+
+    protected async Task CreateApi()
+    {
+        await ApiServices.SaveApiDetails(api);
+        await this.GetApiDetails();
+        this.ClearAll();
+    }
+
+    protected async Task UpdateApi()
+    {
+        await ApiServices.SaveApiDetails(api);
+        await this.GetApiDetails();
+        this.ClearAll();
+    }
+    protected async Task GetApiById(int apiId)
+    {
+        api = await ApiServices.GetApiById(apiId);
+        api.IsUpdate = true;
+        await this.GetApiDetails();
+    }
+    protected async Task DeleteApi(int apiId)
+    {
+        await ApiServices.DeleteApi(apiId);
+        await this.GetApiDetails();
+    }
+    public void ClearAll()
+    {
+        api.ApiName = string.Empty;
+        api.ApiKey = string.Empty;
+    }
+}
+

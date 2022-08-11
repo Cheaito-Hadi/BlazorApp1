@@ -1,0 +1,36 @@
+﻿@page "/signup"
+@using BlazorApp1.Data
+@using BlazorApp1.IServices
+@using BlazorApp1.Controllers
+@inject NavigationManager Navigator
+
+<h3>SignUp</h3>
+
+<EditForm Model="@user" OnValidSubmit="Submit">
+	<DataAnnotationsValidator/>
+	<ValidationSummary/>
+<div class="d-flex flex-column gap-4 mb-3 align-items-center">	
+	<InputText id="title"  placeholder="Email"  @bind-Value="@user.User" />
+	<button class="btn btn-primary" onclick="@CreateUser" value="Sign Up">Sign Up</button>
+	
+</div>
+</EditForm>
+@code {
+	IEnumerable<UserDto> userEntries;
+    [Inject]
+    public IUserService userService { get; set; }
+    UserDto user = new UserDto();
+	
+	
+	 protected async Task CreateUser()
+    {
+        await userService.SignUp(user);
+        Navigator.NavigateTo("login");
+
+    }
+	 void Submit(){
+		Console.WriteLine("write here");
+	}
+
+	
+}
