@@ -16,7 +16,6 @@ namespace BlazorApp1.Services
         {
             _configuration = configuration;
             _connectionString = _configuration.GetConnectionString("SqlConnection");
-            int a = 5;
         }
 
         public async Task<bool> DeleteApi(int id)
